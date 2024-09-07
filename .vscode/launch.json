@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ApplicationInitConfig",
+            "request": "launch",
+            "mainClass": "com.kachina.auth_service.configuration.ApplicationInitConfig",
+            "projectName": "auth-service"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-ProfileServiceApplication<profile-service>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -18,6 +25,17 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.kachina.auth_service.AuthServiceApplication",
             "projectName": "auth-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=63446 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=auth-service"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-IdentityServiceApplication<identity-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.kachina.identity_service.IdentityServiceApplication",
+            "projectName": "identity-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
