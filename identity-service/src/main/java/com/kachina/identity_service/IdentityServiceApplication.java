@@ -13,7 +13,7 @@ public class IdentityServiceApplication {
 	
 	public static void main(String[] args) {
 		SpringApplication.run(IdentityServiceApplication.class, args);
-		log.info("\u001B[32mIdentity Service Running...\u001B[0m");
+		log.info("\u001B[32mIdentity Service Is Running...\u001B[0m");
 	}
 
 }

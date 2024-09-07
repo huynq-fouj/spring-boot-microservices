@@ -11,6 +11,6 @@ public class ProfileServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ProfileServiceApplication.class, args);
-        log.info("\u001B[32mProfile Service Running...\u001B[0m");
+        log.info("\u001B[32mProfile Service Is Running...\u001B[0m");
     }
 }
