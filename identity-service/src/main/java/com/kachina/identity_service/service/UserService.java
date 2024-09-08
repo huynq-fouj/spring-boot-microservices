@@ -1,6 +1,7 @@
 package com.kachina.identity_service.service;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.springframework.stereotype.Service;
 
@@ -98,6 +99,16 @@ public class UserService {
         ProfileResponse profileResponse = profileClient.getProfile(user.get().getId());
 
         return UserMapper.toUserResponse(user.get(), profileResponse);
+    }
+
+    public List<UserResponse> getUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserResponse> response = users.stream()
+            .map(user -> UserMapper.toUserResponse(
+                user, 
+                profileClient.getProfile(user.getId()))
+            ).collect(Collectors.toList());
+        return response;
     }
 
 }

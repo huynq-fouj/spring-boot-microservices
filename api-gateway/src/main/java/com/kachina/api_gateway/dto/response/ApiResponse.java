@@ -1,4 +1,4 @@
-package com.kachina.identity_service.dto.response;
+package com.kachina.api_gateway.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -8,13 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
-    private short code;
+    private int code;
     private String message;
     private T result;
 

@@ -40,7 +40,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(request -> 
-                request.requestMatchers("/api/auth/**")
+                request.requestMatchers("/auth/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
