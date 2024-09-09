@@ -2,6 +2,7 @@ package com.kachina.identity_service.jwt;
 
 import java.security.Key;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,11 +30,16 @@ public class JwtUtils {
     private Long expiration;
 
     public String generateToken(User user) {
-
-        Map<String, Object> map = Map.ofEntries(Map.entry("id", user.getId()));
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("roles", user.getRoles()
+            .stream()
+            .map(role -> 
+                role.getName().name()
+            ).collect(Collectors.toList()));
 
         return Jwts.builder()
-            .setClaims(map)
+            .setClaims(claims)
             .setSubject(user.getUsername())
             .setIssuedAt(new Date())
             .setExpiration(new Date((new Date()).getTime() + expiration))
@@ -63,7 +69,11 @@ public class JwtUtils {
     }
 
     public String getUserId(String token) {
-        return (String) this.extractAllClaims(token).get("id");
+        return (String) extractAllClaims(token).get("id");
+    }
+
+    public List<String> getRoles(String token) {
+        return  (List<String>) extractAllClaims(token).get("roles");
     }
 
     public String getUsername(String token) {

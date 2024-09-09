@@ -19,6 +19,7 @@ public class AuthService {
         return VerifyTokenResponse.builder()
             .valid(jwtUtils.validateJwtToken(token))
             .userId(jwtUtils.getUserId(token))
+            .roles(jwtUtils.getRoles(token))
             .build();
     }
 
