@@ -11,6 +11,7 @@ public class UserMapper {
 
     public static UserResponse toUserResponse(User user, ProfileResponse profile) {
         return UserResponse.builder()
+            .id(user.getId())
             .username(user.getUsername())
             .firstName(profile.getFirstName())
             .lastName(profile.getLastName())

@@ -16,6 +16,7 @@ import com.kachina.identity_service.mapper.*;
 import com.kachina.identity_service.exception.*;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -90,17 +91,15 @@ public class UserService {
         return UserMapper.toUserResponse(user, profileResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String userId) {
         Optional<User> user = userRepository.findById(userId);
-        if(!user.isPresent()) {
-            throw new NotFoundException("User not found with id: " + userId);
-        }
-
+        if(!user.isPresent()) throw new NotFoundException("User not found with id: " + userId);
         ProfileResponse profileResponse = profileClient.getProfile(user.get().getId());
-
         return UserMapper.toUserResponse(user.get(), profileResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
         List<User> users = userRepository.findAll();
         List<UserResponse> response = users.stream()
