@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.kachina.identity_service.config.AuthenticationRequestInterceptor;
 import com.kachina.identity_service.dto.request.ProfileCreationRequest;
 import com.kachina.identity_service.dto.response.ProfileResponse;
 
 @FeignClient(
     name = "profile-service",
-    url = "${app.services.profile.url}"
+    url = "${app.services.profile.url}",
+    configuration = {AuthenticationRequestInterceptor.class}
 )
 public interface ProfileClient {
 
@@ -23,6 +25,10 @@ public interface ProfileClient {
 
     @PutMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     ProfileResponse updateProfile(@PathVariable("userId") String userId, @RequestBody ProfileCreationRequest request);
+
+    //RequestHeader => add header properties
+    // @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    // ProfileResponse getProfile(@RequestHeader("Authorization") String token ,@PathVariable("userId") String userId);
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     ProfileResponse getProfile(@PathVariable("userId") String userId);
