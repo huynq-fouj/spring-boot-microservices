@@ -25,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-    private final String[] PUBLIC_ENDPOINT = {};
+    private final String[] PUBLIC_ENDPOINT = {
+        "/email/**"
+    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
