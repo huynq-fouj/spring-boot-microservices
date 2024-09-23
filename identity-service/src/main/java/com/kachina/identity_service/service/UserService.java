@@ -13,6 +13,7 @@ import com.kachina.identity_service.repository.*;
 import com.kachina.identity_service.repository.httpClient.ProfileClient;
 import com.kachina.identity_service.entity.*;
 import com.kachina.identity_service.mapper.*;
+import com.kachina.identity_service.producer.UserProducer;
 import com.kachina.identity_service.exception.*;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,8 +23,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import org.springframework.kafka.core.KafkaTemplate;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +36,7 @@ public class UserService {
     private final ProfileClient profileClient;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final UserProducer userProducer;
 
     public UserResponse createUser(UserCreationRequest request) {
         if(userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -47,6 +46,7 @@ public class UserService {
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setPassword(encoder.encode(request.getPassword()));
+        newUser.setEmail(request.getEmail());
         Set<Role> roles = new HashSet<>();
 
         Optional<Role> role = roleRepository.findByName(ERole.USER);
@@ -67,8 +67,7 @@ public class UserService {
         profileRequest.setUserId(newUser.getId());
         ProfileResponse profileResponse = profileClient.createProfile(profileRequest);
 
-        // Publish message to kafka
-        kafkaTemplate.send("onboard-successful", "Welcom out new member " + newUser.getUsername());
+        userProducer.sendUserCreationNotification(newUser);
 
         return UserMapper.toUserResponse(newUser, profileResponse);
     }

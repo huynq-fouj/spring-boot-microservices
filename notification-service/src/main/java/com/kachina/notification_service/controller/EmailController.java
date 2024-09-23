@@ -1,6 +1,5 @@
 package com.kachina.notification_service.controller;
 
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +23,6 @@ public class EmailController {
     @PostMapping("/send")
     public EmailResponse sendEmail(@RequestBody SendEmailRequest request) {
         return emailService.sendEmail(request);
-    }
-
-    @KafkaListener(topics = "onboard-successful")
-    public void listenOnBoardSuccessful(String message) {
-        log.info(message);
     }
 
 }
