@@ -23,6 +23,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import org.springframework.kafka.core.KafkaTemplate;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,6 +37,7 @@ public class UserService {
     private final ProfileClient profileClient;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public UserResponse createUser(UserCreationRequest request) {
         if(userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -63,6 +66,9 @@ public class UserService {
         ProfileCreationRequest profileRequest = UserMapper.toProfileCreationRequest(request);
         profileRequest.setUserId(newUser.getId());
         ProfileResponse profileResponse = profileClient.createProfile(profileRequest);
+
+        // Publish message to kafka
+        kafkaTemplate.send("onboard-successful", "Welcom out new member " + newUser.getUsername());
 
         return UserMapper.toUserResponse(newUser, profileResponse);
     }
