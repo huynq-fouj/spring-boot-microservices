@@ -13,6 +13,8 @@ import com.kachina.identity_service.config.AuthenticationRequestInterceptor;
 import com.kachina.identity_service.dto.request.ProfileCreationRequest;
 import com.kachina.identity_service.dto.response.ProfileResponse;
 
+import java.util.List;
+
 @FeignClient(
     name = "profile-service",
     url = "${app.services.profile.url}",
@@ -32,6 +34,9 @@ public interface ProfileClient {
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     ProfileResponse getProfile(@PathVariable("userId") String userId);
+
+    @PostMapping(value = "/list-by-ids", produces = MediaType.APPLICATION_JSON_VALUE)
+    List<ProfileResponse> getProfileByIds(@RequestBody List<String> userIds);
 
     @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     ProfileResponse deleteProfile(@PathVariable("userId") String userId);

@@ -49,6 +49,16 @@
             "projectName": "notification-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-PostServiceApplication<post-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.kachina.post_service.PostServiceApplication",
+            "projectName": "post-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

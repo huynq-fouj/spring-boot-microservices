@@ -26,9 +26,9 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final String[] PUBLIC_ENDPOINT = {
-        "/pid/**",
+        "/p/**",
         "/list",
-        "/uid/**"
+        "/u/**"
     };
 
     @Bean

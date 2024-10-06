@@ -10,4 +10,6 @@ import com.kachina.profile_service.entity.UserProfile;
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, String> {
     Optional<UserProfile> findByUserId(String userId);
+
+    List<UserProfile> findByUserIdIn(List<String> userIds);
 }

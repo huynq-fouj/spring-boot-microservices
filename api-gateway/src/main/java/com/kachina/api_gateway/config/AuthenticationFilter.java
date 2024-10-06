@@ -36,7 +36,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private final PathMatcher pathMatcher;
 
     private final String[] PUBLIC_ENDPOINT = {
-        "/identity/auth/**"
+        "/identity/auth/**",
+        "/post/list",
+        "/post/p/**",
+        "/post/u/**"
     };
 
     @Value("${app.api-prefix}")

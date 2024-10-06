@@ -1,5 +1,7 @@
 package com.kachina.profile_service.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,5 +44,10 @@ public class UserProfileController {
     @DeleteMapping("/delete/{userId}")
     public boolean deleteProfile(@PathVariable("userId") String userId) {
         return userProfileService.deleteUserProfile(userId);
+    }
+
+    @PostMapping(value = "/list-by-ids")
+    List<UserProfileResponse> getProfileByIds(@RequestBody List<String> userIds) {
+        return userProfileService.getUserProfileByIds(userIds);
     }
 }

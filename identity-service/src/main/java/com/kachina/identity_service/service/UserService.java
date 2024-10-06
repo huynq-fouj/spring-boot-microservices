@@ -1,8 +1,11 @@
 package com.kachina.identity_service.service;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
+import feign.FeignException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.kachina.identity_service.dto.request.*;
@@ -25,9 +28,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     
     private final AuthenticationManager authenticationManager;
@@ -37,6 +45,7 @@ public class UserService {
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
     private final UserProducer userProducer;
+    private final ExecutorService executorService;
 
     public UserResponse createUser(UserCreationRequest request) {
         if(userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -108,10 +117,79 @@ public class UserService {
     public List<UserResponse> getUsers() {
         List<User> users = userRepository.findAll();
         List<UserResponse> response = users.stream()
-            .map(user -> UserMapper.toUserResponse(
-                user, 
-                profileClient.getProfile(user.getId()))
-            ).collect(Collectors.toList());
+            .map(user -> toUserResponse(user))
+            .collect(Collectors.toList());
+        return response;
+    }
+
+    private UserResponse toUserResponse(User user) {
+
+        ProfileResponse profileResponse = new ProfileResponse();
+
+        try {
+            profileResponse = profileClient.getProfile(user.getId());
+        } catch (FeignException | RestClientException e) {
+            log.error("Profile not found with id: {}", user.getId());
+        }
+
+        return UserMapper.toUserResponse(
+            user, 
+            profileResponse
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> getUsersV2() {
+        List<User> users = userRepository.findAll();
+
+        List<CompletableFuture<UserResponse>> futures = users.stream()
+                .map(user -> toUserResponseAsync(user))
+                .collect(Collectors.toList());
+
+        return futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
+    }
+
+    @Async
+    private CompletableFuture<UserResponse> toUserResponseAsync(User user) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return CompletableFuture.supplyAsync(() -> {
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+            ProfileResponse profileResponse = new ProfileResponse();
+            try {
+                profileResponse = profileClient.getProfile(user.getId());
+            } catch (FeignException | RestClientException ex) {
+                logErrors(ex, user);
+            }
+            return UserMapper.toUserResponse(user, profileResponse);
+        });
+    }
+
+    private void logErrors(Throwable ex, User user) {
+        if (ex instanceof FeignException) {
+            FeignException feignEx = (FeignException) ex;
+            log.error("FeignException occurred with status: " + feignEx.status() + " for user: " + user.getId(), feignEx);
+        } else {
+            log.error("An error occurred for user: " + user.getId(), ex);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> getUsersV3() {
+        List<User> users = userRepository.findAll();
+
+        List<String> userIds = users.stream().map(user -> user.getId()).collect(Collectors.toList());
+
+        List<ProfileResponse> profileResponses = profileClient.getProfileByIds(userIds);
+
+        List<UserResponse> response = users.stream()
+                .map(user -> {
+                    ProfileResponse profile = profileResponses.stream()
+                            .filter(p -> p.getUserId().equals(user.getId()))
+                            .findFirst()
+                            .orElse(new ProfileResponse());
+                    return UserMapper.toUserResponse(user, profile);
+                })
+                .collect(Collectors.toList());
         return response;
     }
 

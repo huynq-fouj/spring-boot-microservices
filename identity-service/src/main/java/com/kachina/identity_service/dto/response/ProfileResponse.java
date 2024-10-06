@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfileResponse {
+    private String userId;
     private String firstName;
     private String lastName;
     private LocalDate dob;

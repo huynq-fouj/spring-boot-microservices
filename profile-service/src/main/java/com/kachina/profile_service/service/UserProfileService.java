@@ -1,6 +1,7 @@
 package com.kachina.profile_service.service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -52,5 +53,11 @@ public class UserProfileService {
                 .orElseThrow(() -> new RuntimeException("Profile not found!"));
         userProfileRepository.delete(userProfile);
         return true;
+    }
+
+    public List<UserProfileResponse> getUserProfileByIds(List<String> userIds) {
+        return userProfileRepository.findByUserIdIn(userIds).stream()
+                .map(userProfile -> userProfileMapper.toUserProfileResponse(userProfile))
+                .collect(Collectors.toList());
     }
 }

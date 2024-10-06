@@ -52,7 +52,7 @@ public class PostController {
         .build();
     }
 
-    @GetMapping("/pid/{postId}")
+    @GetMapping("/p/{postId}")
     public ApiResponse<PostResponse> getPostById(@PathVariable("postId") String id) {
         return ApiResponse.<PostResponse>builder()
             .code((short) 200)
@@ -86,7 +86,7 @@ public class PostController {
         .build();
     }
 
-    @GetMapping("/uid/{userId}")
+    @GetMapping("/u/{userId}")
     public ApiResponse<Map<String, Object>> getPostsByUser(
         @PathVariable("userId") String id,
         @RequestParam(defaultValue = "0") int page,
